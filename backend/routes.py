@@ -1,11 +1,14 @@
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
+from typing import Annotated
 
 from backend import crud
 from backend.database import get_db
 from backend.schemas import BalanceResponse, MessageResponse, AddResponse, WithdrawResponse
 
 router = APIRouter()
+
+PositiveAmount = Annotated[int, Query(gt=0)]
 
 
 @router.get("/")
@@ -30,7 +33,7 @@ def get_balance(wallet_name: str | None = None, db: Session = Depends(get_db)):
     description="Add money to wallet",
     response_model=AddResponse,
 )
-def add_money(name: str, amount: int, db: Session = Depends(get_db)):
+def add_money(name: str, amount: PositiveAmount, db: Session = Depends(get_db)):
     wallet = crud.add_money(db, name, amount)
     return {
         "message": f"Added {amount} to wallet",
@@ -38,15 +41,16 @@ def add_money(name: str, amount: int, db: Session = Depends(get_db)):
         "balance": wallet.amount,
     }
 
+
 @router.post(
     "/wallet/withdraw",
     description="Withdraw money from wallet",
     response_model=WithdrawResponse,
 )
-def withdraw_money(name: str, amount: int, db: Session = Depends(get_db)):
+def withdraw_money(name: str, amount: PositiveAmount, db: Session = Depends(get_db)):
     wallet = crud.withdraw_money(db, name, amount)
     return {
         "message": f"Withdraw {amount} from wallet",
-        "wallet": name,
-        "balance": wallet.amount,
+        "wallet": wallet.name,
+        "balance": wallet.amount
     }
