@@ -6,17 +6,19 @@ from backend import crud
 from backend.database import get_db
 from backend.schemas import BalanceResponse, MessageResponse, AddResponse, WithdrawResponse
 
-router = APIRouter()
+user_router = APIRouter(tags=['Wallet'])
+
+wellcome_router = APIRouter(tags=['Hi!'], include_in_schema=False)
 
 PositiveAmount = Annotated[int, Query(gt=0)]
 
 
-@router.get("/")
+@wellcome_router.get("/")
 async def root():
     return {"message": "Hello World"}
 
 
-@router.get("/balance", description="Get wallet balance", response_model=BalanceResponse | MessageResponse)
+@user_router.get("/balance", description="Get wallet balance", response_model=BalanceResponse | MessageResponse)
 def get_balance(wallet_name: str | None = None, db: Session = Depends(get_db)):
     if wallet_name is None:
         return {"message": "Wallet name is required"}
@@ -28,7 +30,7 @@ def get_balance(wallet_name: str | None = None, db: Session = Depends(get_db)):
     return {"balance": wallet.amount}
 
 
-@router.post(
+@user_router.post(
     "/wallet/add",
     description="Add money to wallet",
     response_model=AddResponse,
@@ -42,7 +44,7 @@ def add_money(name: str, amount: PositiveAmount, db: Session = Depends(get_db)):
     }
 
 
-@router.post(
+@user_router.post(
     "/wallet/withdraw",
     description="Withdraw money from wallet",
     response_model=WithdrawResponse,

@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 
 from backend.database import Base, engine
-from backend.routes import router
+from backend.routes import wellcome_router, user_router
 
-# Для минимального примера таблицы создаются автоматически при старте.
+
 Base.metadata.create_all(bind=engine)
 
 app = FastAPI(title="Wallet API")
-app.include_router(router)
+
+app.include_router(wellcome_router)
+app.include_router(user_router)
