@@ -2,7 +2,7 @@ from fastapi import HTTPException
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
-from models import WalletModel
+from backend.models import WalletModel
 
 
 def get_wallet(db: Session, name: str) -> WalletModel | None:
@@ -26,7 +26,7 @@ def withdraw_money(db: Session, name: str, amount: int) -> WalletModel | None:
     if wallet is None:
         raise HTTPException(status_code=404, detail="Wallet not found")
     elif wallet.amount < amount:
-        raise HTTPException(status_code=404, detail="U don't have this this much")
+        raise HTTPException(status_code=400, detail="U don't have this this much")
     wallet.amount -= amount
     db.commit()
     db.refresh(wallet)

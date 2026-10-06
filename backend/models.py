@@ -1,7 +1,7 @@
 from sqlalchemy import Float, String
 from sqlalchemy.orm import Mapped, mapped_column
 
-from database import Base
+from backend.database import Base
 
 
 class WalletModel(Base):

@@ -1,9 +1,9 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 
-import crud
-from database import get_db
-from schemas import BalanceResponse, MessageResponse, AddResponse, WithdrawResponse
+from backend import crud
+from backend.database import get_db
+from backend.schemas import BalanceResponse, MessageResponse, AddResponse, WithdrawResponse
 
 router = APIRouter()
 
@@ -48,5 +48,5 @@ def withdraw_money(name: str, amount: int, db: Session = Depends(get_db)):
     return {
         "message": f"Withdraw {amount} from wallet",
         "wallet": name,
-        "balance": amount,
+        "balance": wallet.amount,
     }
