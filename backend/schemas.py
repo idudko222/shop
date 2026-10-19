@@ -1,5 +1,5 @@
 from pydantic import BaseModel, ConfigDict
-
+from typing import Literal
 
 class Wallet(BaseModel):
     name: str | None = None
@@ -15,6 +15,7 @@ class MessageResponse(BaseModel):
 class BalanceResponse(BaseModel):
     balance: int | float
 
+
 class MoneyTransferResponse(BaseModel):
     message: str
     wallet: str
@@ -24,5 +25,18 @@ class MoneyTransferResponse(BaseModel):
 class AddResponse(MoneyTransferResponse):
     pass
 
+
 class WithdrawResponse(MoneyTransferResponse):
     pass
+
+
+class PredictionParams(BaseModel):
+    day_number: int
+    Weekday: Literal[
+        "Monday", "Tuesday", "Wednesday", "Thursday",
+        "Friday", "Saturday", "Sunday"
+    ]
+
+
+class ScoreResponce(BaseModel):
+    money: float

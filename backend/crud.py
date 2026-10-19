@@ -31,3 +31,6 @@ def withdraw_money(db: Session, name: str, amount: int) -> WalletModel | None:
     db.commit()
     db.refresh(wallet)
     return wallet
+
+def get_prediction(db: Session, name: str) -> WalletModel | None:
+    pass

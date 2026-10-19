@@ -1,17 +1,21 @@
 from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from typing import Annotated
+import joblib
+import pandas as pd
 
 from backend import crud
 from backend.database import get_db
-from backend.schemas import BalanceResponse, MessageResponse, AddResponse, WithdrawResponse
+from backend.schemas import (BalanceResponse, MessageResponse, AddResponse,
+                             WithdrawResponse, ScoreResponce, PredictionParams)
 
 user_router = APIRouter(tags=['Wallet'])
-
 wellcome_router = APIRouter(tags=['Hi!'], include_in_schema=False)
+prediction_router = APIRouter(tags=['Prediction'])
 
 PositiveAmount = Annotated[int, Query(gt=0)]
 
+model = joblib.load('models/lr_model.pkl')
 
 @wellcome_router.get("/")
 async def root():
@@ -56,3 +60,19 @@ def withdraw_money(name: str, amount: PositiveAmount, db: Session = Depends(get_
         "wallet": wallet.name,
         "balance": wallet.amount
     }
+
+
+@prediction_router.post(
+    "/score",
+    description="Прогноз дневной выручки",
+    response_model=ScoreResponce,
+)
+def get_prediction(data: PredictionParams):
+    features = pd.DataFrame([{
+        "day_number": data.day_number,
+        "Weekday": data.Weekday,
+    }])
+
+    money = float(model.predict(features)[0])
+
+    return {"money": money}
